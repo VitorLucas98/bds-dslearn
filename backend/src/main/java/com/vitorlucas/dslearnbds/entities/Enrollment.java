@@ -3,27 +3,66 @@ package com.vitorlucas.dslearnbds.entities;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+@Entity
+@Table(name = "tb_enrollment")
 public class Enrollment implements Serializable{
 	private static final long serialVersionUID = 1L;
 
+	@EmbeddedId
+	private EnrollmentPK id = new EnrollmentPK();
 	
+	@Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
 	private Instant enrollMoment;
-	private Instant refundMoment = null;
-	private boolean available = true;
-	private boolean onlyUpdate = true;
-	private List<User> students = new ArrayList<>();
-	private List<Offer> offers = new ArrayList<>();
 	
+	@Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
+	private Instant refundMoment;
+	
+	private boolean available;
+	private boolean onlyUpdate;
+	
+	@OneToMany(mappedBy = "enrollment")
+	private List<Deliver> deliveries = new ArrayList<>();
+	
+	@ManyToMany(mappedBy = "enrollmentsDone")
+	private Set<Lesson> lessonsDone = new HashSet<>();
+
 	public Enrollment() {
 	}
 
-	public Enrollment(Instant enrollMoment, Instant refundMoment, boolean available, boolean onlyUpdate) {
+	public Enrollment(User user, Offer offer, Instant enrollMoment, Instant refundMoment, boolean available,
+			boolean onlyUpdate) {
+		super();
+		id.setUser(user);
+		id.setOffer(offer);
 		this.enrollMoment = enrollMoment;
 		this.refundMoment = refundMoment;
 		this.available = available;
 		this.onlyUpdate = onlyUpdate;
+}
+
+	public User getStudent() {
+		return id.getUser();
+	}
+	
+	public Offer getOffer() {
+		return id.getOffer();
+	}
+	
+	public void setStudent(User student) {
+		id.setUser(student);
+	}
+	public void setOffer(Offer offer) {
+		id.setOffer(offer);
 	}
 
 	public Instant getEnrollMoment() {
@@ -58,20 +97,11 @@ public class Enrollment implements Serializable{
 		this.onlyUpdate = onlyUpdate;
 	}
 
-	public List<User> getStudents() {
-		return students;
-	}
-
-	public List<Offer> getOffers() {
-		return offers;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((offers == null) ? 0 : offers.hashCode());
-		result = prime * result + ((students == null) ? 0 : students.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
@@ -84,19 +114,13 @@ public class Enrollment implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		Enrollment other = (Enrollment) obj;
-		if (offers == null) {
-			if (other.offers != null)
+		if (id == null) {
+			if (other.id != null)
 				return false;
-		} else if (!offers.equals(other.offers))
-			return false;
-		if (students == null) {
-			if (other.students != null)
-				return false;
-		} else if (!students.equals(other.students))
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}
 	
-	
-	
+
 } 

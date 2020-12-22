@@ -2,6 +2,8 @@ package com.vitorlucas.dslearnbds.entities;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,38 +11,50 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="tb_Notification")
-public class Notification implements Serializable {
+@Table(name = "tb_reply")
+public class Reply implements Serializable{
 	private static final long serialVersionUID = 1L;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String text;
+	
+	@Column(columnDefinition="TEXT")
+	private String body;
 	
 	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
 	private Instant moment;
-	private boolean read;
-	private String route;
 	
-	@ManyToOne 
-	@JoinColumn(name = "user_id")
-	private User user;
+	@ManyToOne
+	@JoinColumn(name = "author_id")
+	private User athor;
 	
-	public Notification() {
+	@ManyToOne
+	@JoinColumn(name = "topic_id")
+	private Topic topic;
+
+	@ManyToMany
+	@JoinTable(name = "tb_reply_likes",
+		joinColumns = @JoinColumn(name = "reply_id"),
+		inverseJoinColumns = @JoinColumn(name = "user_id")
+	)
+	private Set<User> likes = new HashSet<>();
+
+	public Reply() {
 	}
 
-	public Notification(Long id, String text, Instant moment, boolean read, String route, User user) {
+	public Reply(Long id, String body, Instant moment, User athor, Topic topic) {
+		super();
 		this.id = id;
-		this.text = text;
+		this.body = body;
 		this.moment = moment;
-		this.read = read;
-		this.route = route;
-		this.user = user;
+		this.athor = athor;
+		this.topic = topic;
 	}
 
 	public Long getId() {
@@ -51,12 +65,12 @@ public class Notification implements Serializable {
 		this.id = id;
 	}
 
-	public String getText() {
-		return text;
+	public String getBody() {
+		return body;
 	}
 
-	public void setText(String text) {
-		this.text = text;
+	public void setBody(String body) {
+		this.body = body;
 	}
 
 	public Instant getMoment() {
@@ -67,28 +81,24 @@ public class Notification implements Serializable {
 		this.moment = moment;
 	}
 
-	public boolean getRead() {
-		return read;
+	public User getAthor() {
+		return athor;
 	}
 
-	public void setRead(boolean read) {
-		this.read = read;
+	public void setAthor(User athor) {
+		this.athor = athor;
 	}
 
-	public String getRoute() {
-		return route;
+	public Topic getTopic() {
+		return topic;
 	}
 
-	public void setRoute(String route) {
-		this.route = route;
+	public void setTopic(Topic topic) {
+		this.topic = topic;
 	}
 
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
+	public Set<User> getLikes() {
+		return likes;
 	}
 
 	@Override
@@ -107,12 +117,15 @@ public class Notification implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Notification other = (Notification) obj;
+		Reply other = (Reply) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
-	}	
+	}
+	
+	
+	
 }
