@@ -1,9 +1,12 @@
 package com.vitorlucas.dslearnbds.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import com.sun.nio.sctp.Notification;
+import com.vitorlucas.dslearnbds.entities.Notification;
 
+
+@Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long>{
 
 }
